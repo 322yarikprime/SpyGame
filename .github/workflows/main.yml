@@ -12,6 +12,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.8'
+      
+      - name: Install system dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y zip unzip openjdk-17-jdk
           
       - name: Install buildozer
         run: |
@@ -19,6 +24,31 @@ jobs:
           
       - name: Build APK
         run: |
+          # Создаем конфиг для buildozer
+          echo "[app]" > buildozer.spec
+          echo "title = SpyGame" >> buildozer.spec
+          echo "package.name = spygame" >> buildozer.spec
+          echo "package.domain = org.yarik" >> buildozer.spec
+          echo "source.dir = ." >> buildozer.spec
+          echo "source.include_exts = py,png,jpg,gif,mp3,ttf" >> buildozer.spec
+          echo "requirements = python3==3.8.13,pygame-ce,sdl2,sdl2_image,sdl2_mixer,sdl2_ttf" >> buildozer.spec
+          echo "orientation = landscape" >> buildozer.spec
+          echo "fullscreen = 1" >> buildozer.spec
+          echo "android.permissions = INTERNET" >> buildozer.spec
+          echo "android.api = 30" >> buildozer.spec
+          echo "android.minapi = 21" >> buildozer.spec
+          echo "android.ndk = 25b" >> buildozer.spec
+          echo "android.sdk = 30" >> buildozer.spec
+          echo "android.arch = arm64-v8a" >> buildozer.spec
+          echo "android.add_assets = images, music" >> buildozer.spec
+          echo "android.presplash = images/menufon.png" >> buildozer.spec
+          echo "android.icon = images/menufon.png" >> buildozer.spec
+          echo "" >> buildozer.spec
+          echo "[buildozer]" >> buildozer.spec
+          echo "log_level = 2" >> buildozer.spec
+          echo "android.accept_sdk_license = True" >> buildozer.spec
+          
+          # Сборка
           buildozer android debug deploy run
           
       - name: Upload APK
