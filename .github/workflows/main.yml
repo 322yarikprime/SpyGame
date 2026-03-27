@@ -13,7 +13,7 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Install dependencies
+      - name: Install system dependencies
         run: |
           sudo apt update
           sudo apt install -y zip unzip openjdk-17-jdk wget
@@ -21,18 +21,15 @@ jobs:
       - name: Install buildozer
         run: pip install buildozer cython
 
-      - name: Accept Android licenses
+      - name: Accept Android licenses and install build-tools
         run: |
-              - name: Install build-tools
-        run: |
-          yes | sdkmanager "build-tools;30.0.3"
           mkdir -p ~/.android
           echo "### User Sources for Android SDK" > ~/.android/repositories.cfg
           yes | sdkmanager --licenses || true
+          yes | sdkmanager "build-tools;30.0.3" "platforms;android-30"
 
       - name: Build APK
         run: |
-          # Создаём buildozer.spec
           cat > buildozer.spec <<EOF
 [app]
 title = SpyGame
@@ -57,6 +54,9 @@ android.icon = images/menufon.png
 log_level = 2
 android.accept_sdk_license = True
 EOF
+          # Убедимся, что SDK tools доступны
+          export ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk
+          export PATH=$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH
           # Сборка
           buildozer android debug deploy run
 
