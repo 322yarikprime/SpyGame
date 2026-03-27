@@ -35,6 +35,10 @@ android.manifest.orientation = landscape
 android.presplash = images/menufon.png
 android.icon = images/menufon.png
 
+android.skip_update = False
+android.accept_sdk_license = True
+android.build_tools_version = 34.0.0
+
 [buildozer]
 
 log_level = 2
