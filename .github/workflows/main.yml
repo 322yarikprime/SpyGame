@@ -1,67 +1,40 @@
-name: Build APK
+name: Build APK (Buildozer)
 
-on: [push]
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    runs-on: ubuntu-22.04
 
-      - name: Set up Python
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: '3.10'
 
-      - name: Install system dependencies
+      - name: Install system dependencies (важно для aidl)
         run: |
-          sudo apt update
-          sudo apt install -y zip unzip openjdk-17-jdk wget
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            libstdc++6 \
+            aidl \
+            openjdk-17-jdk \
+            unzip \
+            zip
 
-      - name: Install buildozer
-        run: pip install buildozer cython
-
-      - name: Accept Android licenses and install build-tools
+      - name: Upgrade pip and install Buildozer
         run: |
-          mkdir -p ~/.android
-          echo "### User Sources for Android SDK" > ~/.android/repositories.cfg
-          yes | sdkmanager --licenses || true
-          yes | sdkmanager "build-tools;30.0.3" "platforms;android-30"
+          python -m pip install --upgrade pip
+          pip install buildozer
 
       - name: Build APK
         run: |
-          cat > buildozer.spec <<EOF
-[app]
-title = SpyGame
-package.name = spygame
-package.domain = org.yarik
-source.dir = .
-source.include_exts = py,png,jpg,gif,mp3,ttf
-version = 0.1
-requirements = python3==3.8.13,pygame-ce,sdl2,sdl2_image,sdl2_mixer,sdl2_ttf
-orientation = landscape
-fullscreen = 1
-android.permissions = INTERNET
-android.api = 30
-android.minapi = 21
-android.ndk = 25b
-android.archs = arm64-v8a, armeabi-v7a
-android.add_assets = images, music
-android.presplash = images/menufon.png
-android.icon = images/menufon.png
-
-[buildozer]
-log_level = 2
-android.accept_sdk_license = True
-EOF
-          # Убедимся, что SDK tools доступны
-          export ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk
-          export PATH=$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH
-          # Сборка
-          buildozer android debug deploy run
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: SpyGame
-          path: bin/*.apk
+          buildozer -v android debug
