@@ -23,6 +23,9 @@ jobs:
 
       - name: Accept Android licenses
         run: |
+              - name: Install build-tools
+        run: |
+          yes | sdkmanager "build-tools;30.0.3"
           mkdir -p ~/.android
           echo "### User Sources for Android SDK" > ~/.android/repositories.cfg
           yes | sdkmanager --licenses || true
