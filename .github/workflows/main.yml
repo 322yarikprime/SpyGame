@@ -8,29 +8,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.8'
           
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          
-      - name: Install dependencies
+      - name: Install buildozer
         run: |
-          sudo apt update
-          sudo apt install -y zip unzip openjdk-17-jdk
           pip install buildozer cython
           
       - name: Build APK
         run: |
-          mkdir -p ~/.buildozer
-          echo 'y' | buildozer android debug deploy run
-        env:
-          BUILD_TYPE: debug
+          buildozer android debug deploy run
           
       - name: Upload APK
         uses: actions/upload-artifact@v4
