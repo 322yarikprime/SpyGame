@@ -31,6 +31,7 @@ jobs:
           echo "package.domain = org.yarik" >> buildozer.spec
           echo "source.dir = ." >> buildozer.spec
           echo "source.include_exts = py,png,jpg,gif,mp3,ttf" >> buildozer.spec
+          echo "version = 0.1" >> buildozer.spec
           echo "requirements = python3==3.8.13,pygame-ce,sdl2,sdl2_image,sdl2_mixer,sdl2_ttf" >> buildozer.spec
           echo "orientation = landscape" >> buildozer.spec
           echo "fullscreen = 1" >> buildozer.spec
