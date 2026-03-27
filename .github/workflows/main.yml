@@ -24,43 +24,38 @@ jobs:
 
       - name: Accept Android SDK licenses
         run: |
-          # Создаём папку для SDK, если её нет
           mkdir -p ~/.android
           echo "### User Sources for Android SDK" > ~/.android/repositories.cfg
-          # Принимаем все лицензии автоматически
           yes | sdkmanager --licenses || true
 
       - name: Build APK
         run: |
-          # Создаём buildozer.spec на лету
-          cat > buildozer.spec <<EOF
-[app]
-title = SpyGame
-package.name = spygame
-package.domain = org.yarik
-source.dir = .
-source.include_exts = py,png,jpg,gif,mp3,ttf
-version = 0.1
-requirements = python3==3.8.13,pygame-ce,sdl2,sdl2_image,sdl2_mixer,sdl2_ttf
-orientation = landscape
-fullscreen = 1
-android.permissions = INTERNET
-android.api = 30
-android.minapi = 21
-android.ndk = 25b
-android.archs = arm64-v8a, armeabi-v7a
-android.add_assets = images, music
-android.presplash = images/menufon.png
-android.icon = images/menufon.png
-
-[buildozer]
-log_level = 2
-android.accept_sdk_license = True
-EOF
-          # Устанавливаем переменные окружения для SDK
+          # Создаём buildozer.spec построчно
+          echo "[app]" > buildozer.spec
+          echo "title = SpyGame" >> buildozer.spec
+          echo "package.name = spygame" >> buildozer.spec
+          echo "package.domain = org.yarik" >> buildozer.spec
+          echo "source.dir = ." >> buildozer.spec
+          echo "source.include_exts = py,png,jpg,gif,mp3,ttf" >> buildozer.spec
+          echo "version = 0.1" >> buildozer.spec
+          echo "requirements = python3==3.8.13,pygame-ce,sdl2,sdl2_image,sdl2_mixer,sdl2_ttf" >> buildozer.spec
+          echo "orientation = landscape" >> buildozer.spec
+          echo "fullscreen = 1" >> buildozer.spec
+          echo "android.permissions = INTERNET" >> buildozer.spec
+          echo "android.api = 30" >> buildozer.spec
+          echo "android.minapi = 21" >> buildozer.spec
+          echo "android.ndk = 25b" >> buildozer.spec
+          echo "android.archs = arm64-v8a, armeabi-v7a" >> buildozer.spec
+          echo "android.add_assets = images, music" >> buildozer.spec
+          echo "android.presplash = images/menufon.png" >> buildozer.spec
+          echo "android.icon = images/menufon.png" >> buildozer.spec
+          echo "" >> buildozer.spec
+          echo "[buildozer]" >> buildozer.spec
+          echo "log_level = 2" >> buildozer.spec
+          echo "android.accept_sdk_license = True" >> buildozer.spec
+          
           export ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk
           export PATH=$ANDROID_HOME/tools/bin:$PATH
-          # Запускаем сборку
           buildozer android debug deploy run
 
       - name: Upload APK
